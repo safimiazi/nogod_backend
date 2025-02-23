@@ -8,10 +8,9 @@ export type TStudent = {
   dateOfBirth?: Date;
   email: string;
   contactNo: string;
-  emergencyContactNo: string;
   bloogGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
-  presentAddress: string;
-  permanentAddress: string;
+  presentAddress?: string;
+  permanentAddress?: string;
   profileImg?: string;
   isDeleted: boolean;
 };

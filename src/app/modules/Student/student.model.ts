@@ -41,11 +41,9 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     },
     presentAddress: {
       type: String,
-      required: [true, 'Present address is required'],
     },
     permanentAddress: {
       type: String,
-      required: [true, 'Permanent address is required'],
     },
 
     profileImg: { type: String, default: '' },

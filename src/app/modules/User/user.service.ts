@@ -11,11 +11,7 @@ import { Student } from '../Student/student.model';
 import { TUser } from './user.interface';
 import { User } from './user.model';
 
-
-const createStudentIntoDB = async (
-  password: string,
-  payload: TStudent,
-) => {
+const createStudentIntoDB = async (password: string, payload: TStudent) => {
   // create a user object
   const userData: Partial<TUser> = {};
 
@@ -28,15 +24,11 @@ const createStudentIntoDB = async (
   userData.email = payload.email;
   // set student status
   userData.status = 'active';
-  
-
-
 
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
-
 
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session }); // array
@@ -52,7 +44,10 @@ const createStudentIntoDB = async (
     const newStudent = await Student.create([payload], { session });
 
     if (!newStudent.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to registration student');
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Failed to registration student',
+      );
     }
 
     await session.commitTransaction();
@@ -66,12 +61,7 @@ const createStudentIntoDB = async (
   }
 };
 
-
-
-const createAdminIntoDB = async (
-  password: string,
-  payload: TAdmin,
-) => {
+const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   // create a user object
   const userData: Partial<TUser> = {};
 
@@ -87,8 +77,6 @@ const createAdminIntoDB = async (
   try {
     session.startTransaction();
     //set  generated id
-
-
 
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session });
@@ -127,8 +115,6 @@ const getMe = async (userId: string, role: string) => {
   if (role === 'admin') {
     result = await Admin.findOne({ id: userId }).populate('user');
   }
-
-
 
   return result;
 };

@@ -22,7 +22,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
         values: ['male', 'female', 'other'],
         message: '{VALUE} is not a valid gender',
       },
-      required: [true, 'Gender is required'],
     },
     dateOfBirth: { type: Date },
     email: {

@@ -14,6 +14,10 @@ import { User } from './user.model';
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   // create a user object
   const userData: Partial<TUser> = {};
+  const isUserExist = await User.findOne({ email: payload.email });
+  if(isUserExist){
+    throw new AppError(httpStatus.BAD_REQUEST, 'User already exist');
+  }
 
   //if password is not given , use default password
   userData.password = password || (config.default_password as string);

@@ -4,7 +4,6 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../errors/AppError';
-import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 import { TAdmin } from '../Admin/admin.interface';
 import { Admin } from '../Admin/admin.model';
 import { TStudent } from '../Student/student.interface';
@@ -14,7 +13,6 @@ import { User } from './user.model';
 
 
 const createStudentIntoDB = async (
-  file: any,
   password: string,
   payload: TStudent,
 ) => {
@@ -28,7 +26,9 @@ const createStudentIntoDB = async (
   userData.role = 'student';
   // set student email
   userData.email = payload.email;
-
+  // set student status
+  userData.status = 'active';
+  
 
 
 
@@ -36,16 +36,7 @@ const createStudentIntoDB = async (
 
   try {
     session.startTransaction();
-    //set  generated id
 
-    if (file) {
-      const imageName = `${userData.id}${payload?.name}`;
-      const path = file?.path;
-
-      //send image to cloudinary
-      const { secure_url } = await sendImageToCloudinary(imageName, path);
-      payload.profileImg = secure_url as string;
-    }
 
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session }); // array
@@ -54,15 +45,14 @@ const createStudentIntoDB = async (
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
     }
-    // set id , _id as user
-    payload.id = newUser[0].id;
+    //  _id as user
     payload.user = newUser[0]._id; //reference _id
 
     // create a student (transaction-2)
     const newStudent = await Student.create([payload], { session });
 
     if (!newStudent.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student');
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to registration student');
     }
 
     await session.commitTransaction();
@@ -79,7 +69,6 @@ const createStudentIntoDB = async (
 
 
 const createAdminIntoDB = async (
-  file: any,
   password: string,
   payload: TAdmin,
 ) => {
@@ -99,13 +88,7 @@ const createAdminIntoDB = async (
     session.startTransaction();
     //set  generated id
 
-    if (file) {
-      const imageName = `${userData.id}${payload?.name?.firstName}`;
-      const path = file?.path;
-      //send image to cloudinary
-      const { secure_url } = await sendImageToCloudinary(imageName, path);
-      payload.profileImg = secure_url as string;
-    }
+
 
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session });

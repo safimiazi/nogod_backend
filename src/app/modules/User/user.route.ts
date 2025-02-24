@@ -7,24 +7,24 @@ import { UserControllers } from './user.controller';
 const router = express.Router();
 
 router.post(
-  '/admin-registration',
+  '/registration',
 
-  UserControllers.createAdmin,
+  UserControllers.registration,
 );
+
 
 router.post(
   '/change-status/:id',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  auth( USER_ROLE.admin),
   UserControllers.changeStatus,
 );
 
 router.get(
   '/me',
   auth(
-    USER_ROLE.superAdmin,
     USER_ROLE.admin,
     USER_ROLE.agent,
-    USER_ROLE.customer_users,
+    USER_ROLE.user,
   ),
   UserControllers.getMe,
 );

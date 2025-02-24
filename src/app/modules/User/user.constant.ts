@@ -1,6 +1,5 @@
 export const USER_ROLE = {
-  superAdmin: 'superAdmin',
-  customer_users: 'customer_users',
+  user: 'user',
   agent: 'agent',
   admin: 'admin',
 } as const;

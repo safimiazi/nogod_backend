@@ -10,7 +10,7 @@ import { User } from './user.model';
 
 
 
-const createAdminIntoDB = async ( payload: TAdmin) => {
+const registrationIntoDB = async ( payload: TAdmin) => {
   // create a user object
   const userData: Partial<TUser> = {};
 
@@ -72,7 +72,7 @@ const changeStatus = async (id: string, payload: { status: string }) => {
 };
 
 export const UserServices = {
-  createAdminIntoDB,
+  registrationIntoDB,
   getMe,
   changeStatus,
 };

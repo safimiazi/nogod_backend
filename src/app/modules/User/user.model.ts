@@ -30,7 +30,7 @@ const userSchema = new Schema<TUser>(
 
     role: {
       type: String,
-      enum: ['superAdmin', 'admin', 'customer_user', 'agent'],
+      enum: [ 'admin', 'user', 'agent'],
     },
 
     isDeleted: {

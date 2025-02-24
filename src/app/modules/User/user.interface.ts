@@ -7,7 +7,7 @@ export interface TUser {
   mobile: string;
   email: string;
   nid: string;
-  role:  'admin' | 'customer_user' | 'agent';
+  role:  'admin' | 'user' | 'agent';
   balance: number;
   isDeleted: boolean;
 }

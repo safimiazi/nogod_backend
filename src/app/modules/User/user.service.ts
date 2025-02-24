@@ -60,7 +60,7 @@ const registrationIntoDB = async (payload: TUser) => {
     if (payload.role.toLowerCase() === 'user') {
       const payload: Partial<ICustomerUser> = {};
       payload.user_id = newUser[0]._id;
-      payload.bonus = 0;
+      payload.bonus = 40;
       createNewUser = await customerUserModel.create([payload], { session });
     }
 

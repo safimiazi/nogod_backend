@@ -8,6 +8,8 @@ export interface TUser {
   email: string;
   nid: string;
   role:  'admin' | 'user' | 'agent';
+  status:  'blocked'| 'active';
+
   balance: number;
   isDeleted: boolean;
 }

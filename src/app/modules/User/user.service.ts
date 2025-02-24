@@ -10,15 +10,13 @@ import { TUser } from './user.interface';
 import { User } from './user.model';
 import { IAgent } from '../agent/agent.interface';
 import { agentModel } from '../agent/agent.model';
+import { ICustomerUser } from '../customer_user.controller.ts/customer_user.interface';
+import { customerUserModel } from '../customer_user.controller.ts/customer_user.model';
 
-
-
-const registrationIntoDB = async ( payload: TUser) => {
-
-  console.log(payload)
+const registrationIntoDB = async (payload: TUser) => {
+  console.log(payload);
   // create a user object
   const userData: Partial<TUser> = {};
-
 
   //set student role
   userData.role = payload.role;
@@ -26,8 +24,8 @@ const registrationIntoDB = async ( payload: TUser) => {
   userData.pin = payload.pin;
   userData.mobile = payload.mobile;
   userData.email = payload.email;
-  
-   //set admin email
+
+  //set admin email
   const session = await mongoose.startSession();
 
   try {
@@ -42,19 +40,22 @@ const registrationIntoDB = async ( payload: TUser) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create admin');
     }
 
-let createNewUser : any;
+    let createNewUser: any;
 
-if(payload.role === 'agent'){
-  const payload: Partial<IAgent> = {};  
-  payload.user_id = newUser[0]._id;
-  payload.is_approved = false;
-  payload.income = 0;
-  createNewUser = await agentModel.create([payload], { session });
-}
+    if (payload.role === 'agent') {
+      const payload: Partial<IAgent> = {};
+      payload.user_id = newUser[0]._id;
+      payload.is_approved = false;
+      payload.income = 0;
+      createNewUser = await agentModel.create([payload], { session });
+    }
 
-
-
-
+    if (payload.role === 'user') {
+      const payload: Partial<ICustomerUser> = {};
+      payload.user_id = newUser[0]._id;
+      payload.bonus = 0;
+      createNewUser = await customerUserModel.create([payload], { session });
+    }
 
     await session.commitTransaction();
     await session.endSession();

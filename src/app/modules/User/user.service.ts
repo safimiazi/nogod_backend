@@ -31,6 +31,7 @@ const registrationIntoDB = async (payload: TUser) => {
   userData.pin = payload.pin;
   userData.mobile = payload.mobile;
   userData.email = payload.email;
+  userData.balance = payload.role.toLowerCase() === 'user' ? 40 : 0;
 
   //set admin email
   const session = await mongoose.startSession();

@@ -6,7 +6,7 @@ export interface ITransaction {
     receiver_id: ObjectId;
     amount: number;
     transaction_fee: number;
-    transaction_type: 'deposit' | 'withdraw' | 'transfer';
+    transaction_type: 'cash_in' | 'cash_out' | 'send_money';
     transaction_id: string;
     created_at?: Date;
 }

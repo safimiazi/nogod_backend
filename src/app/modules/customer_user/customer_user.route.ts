@@ -13,4 +13,4 @@ auth(USER_ROLE.user),
 );
 
 
-export const UserRoutes = router;
+export const customerUserRoute = router;

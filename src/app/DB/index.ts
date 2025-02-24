@@ -16,47 +16,48 @@ const seedAdmin = async () => {
     isDeleted: false,
   };
 
+  // ✅ Check if admin exists BEFORE starting a transaction
+  const isSuperAdminExists = await User.findOne({ role: USER_ROLE.admin });
+  if (isSuperAdminExists) {
+    console.log('Admin user already exists');
+    return;
+  }
+
+  // ✅ Check if email already exists BEFORE starting a transaction
+  const isEmailExists = await User.findOne({ email: user.email });
+  if (isEmailExists) {
+    throw new Error('Email already exists. Please use a different email.');
+  }
+
+  // Start MongoDB session
   const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
-    session.startTransaction();
+    // Create the user inside the transaction
+    const [adminUser] = await User.create([user], { session });
 
-    // Check if admin already exists
-    const isSuperAdminExists = await User.findOne({ role: USER_ROLE.admin });
-    if (isSuperAdminExists) {
-      console.log('Admin user already exists');
-      return;
-    }
+    console.log(`New admin user created with ID: ${adminUser._id}`);
 
-    // Check if email already exists
-    const isEmailExists = await User.findOne({ email: user.email });
-    if (isEmailExists) {
-      throw new Error('Email already exists. Please use a different email.');
-    }
-
-    // Create the user document
-    const adminUser = await User.create([user], { session });
-    console.log(adminUser[0]._id);
-    // Prepare payload for Admin model
+    // Create the admin document inside the transaction
     const payload = {
-      user: adminUser[0]._id,
-      total_income: 0, // Use valid values here, not empty strings
-      total_money_in_system: 0, // Use valid values
+      user: adminUser._id,
+      total_income: 0,
+      total_money_in_system: 0,
     };
 
-    // Create the admin record
     await Admin.create([payload], { session });
 
-    // Commit the transaction
+    // ✅ Commit transaction
     await session.commitTransaction();
     console.log('Admin user and admin record created successfully');
   } catch (error: any) {
     console.error('Error during transaction:', error.message);
 
-    // Abort the transaction if something goes wrong
+    // ✅ Abort transaction only if commit didn't happen
     await session.abortTransaction();
   } finally {
-    // End the session whether the transaction was successful or not
+    // ✅ Always end session properly
     await session.endSession();
   }
 };

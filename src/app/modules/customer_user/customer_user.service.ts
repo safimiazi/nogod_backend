@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 import { User } from "../User/user.model";
 import { Admin } from "../Admin/admin.model";
 import { sendNotification } from "../../utils/notification";
+import { transactionModel } from "../transaction/transaction.model";
+import { generateRandomUniqueNumber } from "../../utils/generate_rendom_unique_number";
+import { transaction_type } from "../../utils/constant";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const SEND_MONEY_FEE = 5;
@@ -43,6 +46,24 @@ const UserSendMoneyToUserIntoDb = async (senderPhone: string, receiverPhone: str
       await sender.save({ session });
       await receiver.save({ session });
       await admin.save({ session });
+
+
+
+  // **Record Transaction in transactionModel**
+  const transactionRecord = new transactionModel({
+    sender_id: sender._id,
+    receiver_id: receiver._id,
+    amount: amount,
+    transaction_fee: transactionFee,
+    transaction_type: transaction_type.send_money,
+    transaction_id: generateRandomUniqueNumber(), // Unique transaction ID
+  });
+
+  await transactionRecord.save({ session });
+
+
+
+
 
       await session.commitTransaction();
       session.endSession();

@@ -12,5 +12,9 @@ auth(USER_ROLE.user),
   CustomerUserControllers.UserSendMoneyToUser,
 );
 
+router.post('/cash-out',auth(USER_ROLE.user),
+CustomerUserControllers.UserCashOut);
+
+
 
 export const customerUserRoute = router;

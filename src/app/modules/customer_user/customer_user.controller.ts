@@ -28,6 +28,31 @@ const UserSendMoneyToUser = async (
   }
 };
 
+
+const UserCashOut = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { amount, mobile: receiverPhone } = req.body;
+    const { mobile: senderPhone } = req.user;
+    const result = await CustomerUserServices.UserSendMoneyToUserIntoDb(
+      senderPhone,
+      receiverPhone,
+      amount,
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Money is sent successfully!',
+      data: result,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
 export const CustomerUserControllers = {
-  UserSendMoneyToUser,
+  UserSendMoneyToUser, UserCashOut
 };

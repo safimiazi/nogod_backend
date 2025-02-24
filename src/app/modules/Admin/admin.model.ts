@@ -1,5 +1,4 @@
 import { Schema, model } from 'mongoose';
-import { Gender } from './admin.constant';
 import { AdminModel, TAdmin } from './admin.interface';
 
 const adminSchema = new Schema<TAdmin, AdminModel>(
@@ -10,38 +9,13 @@ const adminSchema = new Schema<TAdmin, AdminModel>(
       unique: true,
       ref: 'User',
     },
-    designation: {
-      type: String,
-      required: [true, 'Designation is required'],
+    total_income: {
+      type: Number,
     },
-    name: {
-      type: String,
-      required: [true, 'Name is required'],
+    total_money_in_system: {
+      type: Number,
     },
-    gender: {
-      type: String,
-      enum: {
-        values: Gender,
-        message: '{VALUE} is not a valid gender',
-      },
-      required: [true, 'Gender is required'],
-    },
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      unique: true,
-    },
-    contactNo: { type: String, required: [true, 'Contact number is required'] },
 
-    presentAddress: {
-      type: String,
-      required: [true, 'Present address is required'],
-    },
-    permanentAddress: {
-      type: String,
-      required: [true, 'Permanent address is required'],
-    },
-    profileImg: { type: String, default: '' },
     isDeleted: {
       type: Boolean,
       default: false,

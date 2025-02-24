@@ -18,9 +18,12 @@ const registrationIntoDB = async (payload: TUser) => {
   if (isUserExists) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Account already exists');
   }
-  if (isUserExists && isUserExists.mobile === payload.mobile) {
+
+  const isUserMobileExists: any = await User.findOne({ mobile: payload.mobile }) as TUser | null;
+  if (isUserMobileExists) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Account already exists');
   }
+
 
   // create a user object
   const userData: Partial<TUser> = {};

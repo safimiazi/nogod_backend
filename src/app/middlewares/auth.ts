@@ -24,19 +24,13 @@ const auth = (...requiredRoles: TUserRole[]) => {
 
     const {
       userId  ,
-      email,
-      nid,
-      mobile,
+    
       role,
     } = decoded;
-
     // checking if the user is exist
     const user = await User.findOne({
       _id: userId,
-      email,
-      nid,
-      mobile,
-      role,
+     
     });
 
     if (!user) {
@@ -56,7 +50,6 @@ const auth = (...requiredRoles: TUserRole[]) => {
     if (userStatus === 'blocked') {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
     }
-
 
     if (requiredRoles && !requiredRoles.includes(role)) {
       throw new AppError(

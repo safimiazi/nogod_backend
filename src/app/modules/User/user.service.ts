@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from 'http-status';
@@ -7,18 +8,26 @@ import { TAdmin } from '../Admin/admin.interface';
 import { Admin } from '../Admin/admin.model';
 import { TUser } from './user.interface';
 import { User } from './user.model';
+import { IAgent } from '../agent/agent.interface';
+import { agentModel } from '../agent/agent.model';
 
 
 
-const registrationIntoDB = async ( payload: TAdmin) => {
+const registrationIntoDB = async ( payload: TUser) => {
+
+  console.log(payload)
   // create a user object
   const userData: Partial<TUser> = {};
 
-  //if password is not given , use deafult password
 
   //set student role
-  userData.role = 'admin';
-  //set admin email
+  userData.role = payload.role;
+  userData.name = payload.name;
+  userData.pin = payload.pin;
+  userData.mobile = payload.mobile;
+  userData.email = payload.email;
+  
+   //set admin email
   const session = await mongoose.startSession();
 
   try {
@@ -32,21 +41,25 @@ const registrationIntoDB = async ( payload: TAdmin) => {
     if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create admin');
     }
-    // set id , _id as user
-    payload.id = newUser[0].id;
-    payload.user = newUser[0]._id; //reference _id
 
-    // create a admin (transaction-2)
-    const newAdmin = await Admin.create([payload], { session });
+let createNewUser : any;
 
-    if (!newAdmin.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create admin');
-    }
+if(payload.role === 'agent'){
+  const payload: Partial<IAgent> = {};  
+  payload.user_id = newUser[0]._id;
+  payload.is_approved = false;
+  payload.income = 0;
+  createNewUser = await agentModel.create([payload], { session });
+}
+
+
+
+
 
     await session.commitTransaction();
     await session.endSession();
 
-    return newAdmin;
+    return createNewUser;
   } catch (err: any) {
     await session.abortTransaction();
     await session.endSession();

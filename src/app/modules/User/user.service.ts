@@ -37,7 +37,7 @@ const registrationIntoDB = async (payload: TUser) => {
 
     //create a admin
     if (!newUser.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create admin');
+      throw new AppError(httpStatus.BAD_REQUEST, `Failed to create ${payload.role}`);
     }
 
     let createNewUser: any;

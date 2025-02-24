@@ -10,13 +10,16 @@ import { TUser } from './user.interface';
 import { User } from './user.model';
 import { IAgent } from '../agent/agent.interface';
 import { agentModel } from '../agent/agent.model';
-import { ICustomerUser } from '../customer_user.controller.ts/customer_user.interface';
-import { customerUserModel } from '../customer_user.controller.ts/customer_user.model';
+import { ICustomerUser } from '../customer_user/customer_user.interface';
+import { customerUserModel } from '../customer_user/customer_user.model';
 
 const registrationIntoDB = async (payload: TUser) => {
-  const isUserExists = await User.findOne({ email: payload.email });
+  const isUserExists: any = await User.findOne({ email: payload.email }) as TUser | null;
   if (isUserExists) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'User already exists');
+    throw new AppError(httpStatus.BAD_REQUEST, 'Account already exists');
+  }
+  if (isUserExists && isUserExists.mobile === payload.mobile) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Account already exists');
   }
 
   // create a user object
@@ -34,7 +37,6 @@ const registrationIntoDB = async (payload: TUser) => {
 
   try {
     session.startTransaction();
-    //set  generated id
 
     // create a user (transaction-1)
     const newUser = await User.create([payload], { session });

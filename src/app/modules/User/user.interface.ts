@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import { Model } from 'mongoose';
 import { USER_ROLE } from './user.constant';
 
 export interface TUser {
@@ -12,6 +13,16 @@ export interface TUser {
 
   balance: number;
   isDeleted: boolean;
+}
+
+export interface UserModel extends Model<TUser> {
+
+  //instance methods for checking if passwords are matched
+  isPinMatched(
+    plainTextPin: string,
+    hashedPin: string,
+  ): Promise<boolean>;
+ 
 }
 
 export type TUserRole = keyof typeof USER_ROLE;

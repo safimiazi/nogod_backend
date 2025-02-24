@@ -1,12 +1,44 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
 import config from '../../config';
+import AppError from '../../errors/AppError';
+import { User } from '../User/user.model';
 import { TLoginUser } from './auth.interface';
 import { createToken } from './auth.utils';
 
 const loginUser = async (payload: TLoginUser) => {
+  // checking if the user is exist
+  const user = await User.findOne({ email: payload?.email });
 
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+  }
+  // checking if the user is already deleted
+
+  const isDeleted = user?.isDeleted;
+
+  if (isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
+  }
+
+  // checking if the user is blocked
+
+  const userStatus = user?.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  }
+
+  //checking if the password is correct
+
+  if (!(await (User as any).isPinMatched(payload?.pin, user?.pin)))
+    throw new AppError(httpStatus.FORBIDDEN, 'Pin do not matched');
+
+  //create token and sent to the  client
 
   const jwtPayload = {
     userEmail: user.email,
+    userNid: user.nid,
     role: user.role,
   };
 

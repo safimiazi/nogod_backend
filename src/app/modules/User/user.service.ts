@@ -14,7 +14,11 @@ import { ICustomerUser } from '../customer_user.controller.ts/customer_user.inte
 import { customerUserModel } from '../customer_user.controller.ts/customer_user.model';
 
 const registrationIntoDB = async (payload: TUser) => {
-  console.log(payload);
+  const isUserExists = await User.findOne({ email: payload.email });
+  if (isUserExists) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User already exists');
+  }
+
   // create a user object
   const userData: Partial<TUser> = {};
 
@@ -37,7 +41,10 @@ const registrationIntoDB = async (payload: TUser) => {
 
     //create a admin
     if (!newUser.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, `Failed to create ${payload.role}`);
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Failed to create ${payload.role}`,
+      );
     }
 
     let createNewUser: any;

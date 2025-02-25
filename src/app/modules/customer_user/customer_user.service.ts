@@ -41,8 +41,8 @@ const UserSendMoneyToUserIntoDb = async (
   session.startTransaction();
 
   try {
-    const sender = await User.findOne({ mobile: senderPhone }).session(session);
-    const receiver = await User.findOne({ mobile: receiverPhone }).session(
+    const sender = await User.findOne({ mobile: senderPhone, role: USER_ROLE.user }).session(session);
+    const receiver = await User.findOne({ mobile: receiverPhone, role: USER_ROLE.user }).session(
       session,
     );
     const adminUser = await User.findOne({ role: USER_ROLE.admin }).session(
@@ -148,7 +148,8 @@ const UserCashOutIntodb = async (
     
       try {
         // Find user and agent
-        const user = await User.findOne({ mobile: userPhone }).session(session);
+        const user = await User.findOne({ mobile: userPhone, role: USER_ROLE.user }).session(session);
+        
         const agentUser = await User.findOne({ mobile: agentPhone, role: USER_ROLE.agent }).session(session);
         const adminUser = await User.findOne({ role: USER_ROLE.admin }).session(session);
     
@@ -205,7 +206,7 @@ const UserCashOutIntodb = async (
         // Record transaction
         const transactionRecord = new transactionModel({
           sender_id: user._id,
-          receiver_id: agent._id,
+          receiver_id: agentUser._id,
           amount: amount,
           transaction_fee: cashOutFee,
           transaction_type: transaction_type.cash_out,

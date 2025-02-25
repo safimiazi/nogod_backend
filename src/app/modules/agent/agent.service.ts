@@ -6,6 +6,9 @@ import AppError from '../../errors/AppError';
 import { USER_ROLE } from '../User/user.constant';
 import { Admin } from '../Admin/admin.model';
 import { sendNotification } from '../../utils/notification';
+import { transactionModel } from '../transaction/transaction.model';
+import { transaction_type } from '../../utils/constant';
+import { generateRandomUniqueNumber } from '../../utils/generate_rendom_unique_number';
 
 export const CashInService = {
   cashInUserThroughAgent: async (
@@ -18,17 +21,18 @@ export const CashInService = {
     session.startTransaction();
 
     try {
-
-
-        if (Number(amount) <= 0) {
-            throw new AppError(httpStatus.BAD_REQUEST, 'Invalid amount.');
-          }
+      if (Number(amount) <= 0) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Invalid amount.');
+      }
       // Find agent and user
       const agentUser = await User.findOne({
         mobile: agentPhone,
         role: USER_ROLE.agent,
       }).session(session);
-      const user = await User.findOne({ mobile: userPhone, role: USER_ROLE.user }).session(session);
+      const user = await User.findOne({
+        mobile: userPhone,
+        role: USER_ROLE.user,
+      }).session(session);
       const adminUser = await User.findOne({ role: USER_ROLE.admin }).session(
         session,
       );
@@ -44,8 +48,6 @@ export const CashInService = {
         throw new AppError(httpStatus.FORBIDDEN, 'Agent is blocked');
       }
 
-   
-
       if (!adminUser) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Admin user not found.');
       }
@@ -58,11 +60,11 @@ export const CashInService = {
         session,
       );
 
-      if(!admin){
+      if (!admin) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Admin not found.');
       }
 
-      if(await (User as any).isPinMatched(agentPin, agentUser.pin)){
+      if (!(await (User as any).isPinMatched(agentPin, agentUser.pin))) {
         throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid agent PIN.');
       }
 
@@ -72,6 +74,20 @@ export const CashInService = {
 
       await user.save({ session });
       await admin.save({ session });
+
+
+    // **Record transaction history**
+    const transactionRecord = new transactionModel({
+        sender_id: agentUser._id, // Agent is sending money
+        receiver_id: user._id, // User is receiving money
+        amount: Number(amount),
+        transaction_fee: 0, // No fee for cash-in
+        transaction_type: transaction_type.cash_in,
+        transaction_id: generateRandomUniqueNumber(), // Unique transaction ID
+      });
+
+      await transactionRecord.save({ session });
+
 
       await session.commitTransaction();
       session.endSession();

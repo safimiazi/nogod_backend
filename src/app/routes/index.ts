@@ -4,6 +4,7 @@ import { AuthRoutes } from '../modules/Auth/auth.route';
 
 import { UserRoutes } from '../modules/User/user.route';
 import { customerUserRoute } from '../modules/customer_user/customer_user.route';
+import { agentRoute } from '../modules/agent/agent.route';
 
 const router = Router();
 
@@ -15,6 +16,10 @@ const moduleRoutes = [
   {
     path: '/admins',
     route: AdminRoutes,
+  },
+  {
+    path: '/agent',
+    route: agentRoute,
   },
   
   {

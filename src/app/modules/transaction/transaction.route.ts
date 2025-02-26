@@ -8,9 +8,15 @@ const router = express.Router();
 
 router.get(
   '/transaction-report',
-auth(USER_ROLE.user
+auth(USER_ROLE.user, USER_ROLE.agent
 ),
   transactionControllers.getAllTransection,
+);
+router.get(
+  '/agent-transactions',
+auth( USER_ROLE.agent, USER_ROLE.admin
+),
+  transactionControllers.getAgentTransactions,
 );
 
 

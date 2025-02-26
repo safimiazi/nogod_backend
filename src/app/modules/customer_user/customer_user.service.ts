@@ -19,10 +19,6 @@ const MIN_SEND_AMOUNT = 50;
 const FEE_THRESHOLD = 100;
 
 
-// for cash out
-const CASH_OUT_FEE_PERCENT = 1.5; // 1.5% Fee
-const AGENT_INCOME_PERCENT = 1.0; // 1% for Agent
-const ADMIN_INCOME_PERCENT = 0.5; // 0.5% for Admin
 
 
 const UserSendMoneyToUserIntoDb = async (
@@ -48,12 +44,26 @@ const UserSendMoneyToUserIntoDb = async (
     const adminUser = await User.findOne({ role: USER_ROLE.admin }).session(
       session,
     );
-    if (!sender || !receiver || !adminUser) {
+    if (!sender) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        'Sender, Receiver, or Admin not found.',
+        'Sender not found.',
       );
     }
+    if (!receiver) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Receiver not found.',
+      );
+    }
+    if (!adminUser) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Admin user not found.',
+      );
+    }
+
+   
     const admin = await Admin.findOne({ user: adminUser._id }).session(session);
     if (!admin) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Admin not found.');
@@ -130,6 +140,10 @@ const UserSendMoneyToUserIntoDb = async (
 
 
 
+// for cash out
+const CASH_OUT_FEE_PERCENT = 1.5; // 1.5% Fee
+const AGENT_INCOME_PERCENT = 1.0; // 1% for Agent
+const ADMIN_INCOME_PERCENT = 0.5; // 0.5% for Admin
 
 
 const UserCashOutIntodb = async (
@@ -160,6 +174,10 @@ const UserCashOutIntodb = async (
         if(agentUser.status === 'blocked'){
           throw new AppError(httpStatus.FORBIDDEN, 'Agent is blocked');
         }
+
+        if (user.balance < amount) {
+          throw new AppError(httpStatus.BAD_REQUEST, "Insufficient amount for this transaction");
+        }
     
         // Validate user's account PIN
         if (!(await (User as any).isPinMatched(accountPin, user?.pin)))
@@ -182,9 +200,9 @@ const UserCashOutIntodb = async (
         }
     
         // Calculate fees
-        const cashOutFee = (Number(amount) * CASH_OUT_FEE_PERCENT) / 100;
-        const agentIncome = (Number(amount) * AGENT_INCOME_PERCENT) / 100;
-        const adminIncome = (Number(amount) * ADMIN_INCOME_PERCENT) / 100;
+        const cashOutFee = parseFloat(((Number(amount) * CASH_OUT_FEE_PERCENT) / 100).toString());
+        const agentIncome = parseFloat(((Number(amount) * AGENT_INCOME_PERCENT) / 100).toString());
+        const adminIncome = parseFloat(((Number(amount) * ADMIN_INCOME_PERCENT) / 100).toString());
         const totalDeductible = Number(amount) + cashOutFee;
     
         if (user.balance < totalDeductible) {
@@ -194,7 +212,7 @@ const UserCashOutIntodb = async (
         // Update balances
         user.balance -= totalDeductible;
         agentUser.balance += amount - agentIncome; // Agent gets amount minus their 1% cut
-        admin.total_money_in_system += adminIncome; // Admin earns 0.5%
+        admin.total_income += adminIncome; // Admin earns 0.5%
         agent.income += agentIncome; // Agent's income increases
         // Save changes
         await user.save({ session });

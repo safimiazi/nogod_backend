@@ -4,7 +4,6 @@ import httpStatus from 'http-status';
 import { User } from '../User/user.model';
 import AppError from '../../errors/AppError';
 import { USER_ROLE } from '../User/user.constant';
-import { Admin } from '../Admin/admin.model';
 import { sendNotification } from '../../utils/notification';
 import { transactionModel } from '../transaction/transaction.model';
 import { transaction_type } from '../../utils/constant';
@@ -36,36 +35,41 @@ export const AgnetServices = {
         mobile: userPhone,
         role: USER_ROLE.user,
       }).session(session);
-      const adminUser = await User.findOne({ role: USER_ROLE.admin }).session(
-        session,
-      );
-
-      if (!agentUser || !user) {
+ 
+      if ( !user) {
         throw new AppError(
           httpStatus.BAD_REQUEST,
-          'Agent, User, or Admin user not found.',
+          'Customer user not found.',
         );
       }
+
+
+      if (!agentUser) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'Agent user not found.',
+        );
+      }
+
+      
+      if (Number(agentUser.balance) < Number(amount)) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'Your balance is too low.',
+        );
+      }
+
+
 
       if (agentUser.status === 'blocked') {
         throw new AppError(httpStatus.FORBIDDEN, 'Agent is blocked');
       }
 
-      if (!adminUser) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Admin user not found.');
-      }
-
+    
       if (user.status === 'blocked') {
         throw new AppError(httpStatus.FORBIDDEN, 'User is blocked');
       }
 
-      const admin = await Admin.findOne({ user: adminUser._id }).session(
-        session,
-      );
-
-      if (!admin) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Admin not found.');
-      }
 
       if (!(await (User as any).isPinMatched(agentPin, agentUser.pin))) {
         throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid agent PIN.');
@@ -73,10 +77,9 @@ export const AgnetServices = {
 
       // Update balances
       user.balance += Number(amount);
-      admin.total_money_in_system += Number(amount);
-
+      agentUser.balance -= Number(amount)
       await user.save({ session });
-      await admin.save({ session });
+      await agentUser.save({ session });
 
 
     // **Record transaction history**

@@ -7,6 +7,7 @@ import httpStatus from 'http-status';
 export const AgentController = {
   cashInUserThroughAgent: catchAsync(async (req: Request, res: Response) => {
     const { userPhone, amount, agentPin } = req.body;
+    console.log(req.body)
     const { mobile: agentPhone } = req.user;
     const result = await AgnetServices.cashInUserThroughAgent(
       agentPhone,

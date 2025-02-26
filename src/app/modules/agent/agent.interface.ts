@@ -1,4 +1,5 @@
-import mongoose, { ObjectId } from "mongoose";
+import mongoose from "mongoose";
+import { ObjectId } from "mongoose";
 
 export interface IAgent {
     _id?: ObjectId;

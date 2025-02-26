@@ -6,7 +6,7 @@ import { transactionControllers } from './transaction.controller';
 
 const router = express.Router();
 
-router.post(
+router.get(
   '/transaction-report',
 auth(USER_ROLE.user
 ),
@@ -14,4 +14,4 @@ auth(USER_ROLE.user
 );
 
 
-export const UserRoutes = router;
+export const transactionRoute = router;

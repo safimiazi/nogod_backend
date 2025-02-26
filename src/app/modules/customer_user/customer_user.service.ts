@@ -2,13 +2,13 @@ import mongoose from 'mongoose';
 import { User } from '../User/user.model';
 import { sendNotification } from '../../utils/notification';
 import { transactionModel } from '../transaction/transaction.model';
-import { generateRandomUniqueNumber } from '../../utils/generate_rendom_unique_number';
 import { transaction_type } from '../../utils/constant';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { USER_ROLE } from '../User/user.constant';
 import { Admin } from '../Admin/admin.model';
 import { agentModel } from '../agent/agent.model';
+import { generateTransactionId } from '../../utils/generate_rendom_unique_number';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -71,8 +71,8 @@ const UserSendMoneyToUserIntoDb = async (
     // Update balances
     const newSenderBalance = sender.balance - totalDeductible;
     const newReceiverBalance = receiver.balance + Number(amount);
-    const newAdminTotalMoneyInSystem =
-      admin.total_money_in_system + transactionFee;
+    const adminIncome =
+      admin.total_income + transactionFee;
 
     await User.updateOne(
       { mobile: senderPhone },
@@ -86,7 +86,7 @@ const UserSendMoneyToUserIntoDb = async (
     );
     await Admin.updateOne(
       { user: adminUser._id },
-      { total_money_in_system: newAdminTotalMoneyInSystem },
+      { total_income: adminIncome, },
       { session },
     );
 
@@ -97,7 +97,7 @@ const UserSendMoneyToUserIntoDb = async (
       amount: Number(amount),
       transaction_fee: transactionFee,
       transaction_type: transaction_type.send_money,
-      transaction_id: generateRandomUniqueNumber(), // Unique transaction ID
+      transaction_id: generateTransactionId(), // Unique transaction ID
     });
 
     await transactionRecord.save({ session });
@@ -208,7 +208,7 @@ const UserCashOutIntodb = async (
           amount: amount,
           transaction_fee: cashOutFee,
           transaction_type: transaction_type.cash_out,
-          transaction_id: generateRandomUniqueNumber(),
+          transaction_id: generateTransactionId(),
         });
     
         await transactionRecord.save({ session });

@@ -8,7 +8,7 @@ import { Admin } from '../Admin/admin.model';
 import { sendNotification } from '../../utils/notification';
 import { transactionModel } from '../transaction/transaction.model';
 import { transaction_type } from '../../utils/constant';
-import { generateRandomUniqueNumber } from '../../utils/generate_rendom_unique_number';
+import { generateTransactionId } from '../../utils/generate_rendom_unique_number';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { agentModel } from './agent.model';
 import { AdminSearchableFields } from '../Admin/admin.constant';
@@ -86,7 +86,7 @@ export const AgnetServices = {
         amount: Number(amount),
         transaction_fee: 0, // No fee for cash-in
         transaction_type: transaction_type.cash_in,
-        transaction_id: generateRandomUniqueNumber(), // Unique transaction ID
+        transaction_id: generateTransactionId(), // Unique transaction ID
       });
 
       await transactionRecord.save({ session });

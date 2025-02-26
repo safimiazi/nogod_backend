@@ -8,6 +8,11 @@ const agentSchema = new mongoose.Schema<IAgent>({
         enum: ['approved', 'pending', 'rejected'],
         default: 'pending',
       },
+      status: {
+        type: String,
+        enum: ['blocked', 'active'],
+        default: 'active',
+      },
       mobile: {
         type: String,
         required: true,

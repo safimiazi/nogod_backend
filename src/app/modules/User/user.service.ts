@@ -12,6 +12,8 @@ import { IAgent } from '../agent/agent.interface';
 import { agentModel } from '../agent/agent.model';
 import { ICustomerUser } from '../customer_user/customer_user.interface';
 import { customerUserModel } from '../customer_user/customer_user.model';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { AdminSearchableFields } from '../Admin/admin.constant';
 
 const registrationIntoDB = async (payload: TUser) => {
   const isUserExists: any = await User.findOne({ email: payload.email }) as TUser | null;
@@ -99,8 +101,27 @@ const changeStatus = async (id: string, payload: { status: string }) => {
   return result;
 };
 
+
+const getAllUserFromDB = async (query: Record<string, unknown>) => {
+  const userQuery = new QueryBuilder(User.find({ status: "active" }), query)
+    .search(AdminSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await userQuery.modelQuery 
+  .exec();
+  const meta = await userQuery.countTotal();
+  return {
+    result,
+    meta,
+  };
+};
+
 export const UserServices = {
   registrationIntoDB,
   getMe,
   changeStatus,
+  getAllUserFromDB
 };

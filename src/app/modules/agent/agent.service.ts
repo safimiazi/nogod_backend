@@ -114,7 +114,7 @@ export const AgnetServices = {
   },
 
  getAllApprovedAgent : async (query: Record<string, unknown>) => {
-    const userQuery = new QueryBuilder(agentModel.find({ is_approved: "approved" }), query)
+    const userQuery = new QueryBuilder(agentModel.find({ is_approved: "approved", status: "active" }), query)
       .search(AdminSearchableFields)
       .filter()
       .sort()

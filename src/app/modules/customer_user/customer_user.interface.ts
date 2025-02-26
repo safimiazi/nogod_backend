@@ -5,6 +5,7 @@ export interface ICustomerUser {
     user_id: mongoose.Types.ObjectId;
     bonus: number;
     mobile: string;
+    status:  'blocked'| 'active';
 
     created_at?: Date;
     updated_at?: Date;

@@ -6,10 +6,11 @@ import { AdminSearchableFields } from "./admin.constant";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 import { agentModel } from "../agent/agent.model";
+import { customerUserModel } from "../customer_user/customer_user.model";
 
 
 const getAllAgentFromDB = async (query: Record<string, unknown>) => {
-  const userQuery = new QueryBuilder(agentModel.find({ is_approved: "pending" }), query)
+  const userQuery = new QueryBuilder(agentModel.find({ is_approved: "pending", status: "active" }), query)
     .search(AdminSearchableFields)
     .filter()
     .sort()
@@ -25,6 +26,24 @@ const getAllAgentFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
+
+const getAllCustomerUserFromDB = async (query: Record<string, unknown>) => {
+  const userQuery = new QueryBuilder(customerUserModel.find({  status: "active" }), query)
+    .search(AdminSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await userQuery.modelQuery.populate("user_id")
+  .exec();
+  const meta = await userQuery.countTotal();
+  return {
+    result,
+    meta,
+  };
+};
+
 const getSingleUserFromDB = async (id: string) => {
   const result = await User.findOne({_id: id});
   return result;
@@ -32,33 +51,44 @@ const getSingleUserFromDB = async (id: string) => {
 
 
 
-const blockUserFromDB = async (id: string) => {
+const blockUserFromDB = async (userId: string, agentId: string) => {
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
 
-    const blockUser = await User.findByIdAndUpdate(
-      id,
-      { status: "block" },
-      { new: true, session },
+    // Block the user
+    const blockedUser = await User.findByIdAndUpdate(
+      { _id: userId }, 
+      { status: "blocked" }, 
+      { new: true, session }
     );
 
-    if (!blockUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to block student');
+    if (!blockedUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Failed to block user");
     }
 
-   
+    // Block the agent
+    const blockedAgent = await agentModel.findByIdAndUpdate(
+      { _id: agentId }, 
+      { status: "blocked" }, 
+      { new: true, session }
+    );
+
+    if (!blockedAgent) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Failed to block agent");
+    }
 
     await session.commitTransaction();
-    await session.endSession();
+    return { blockedUser, blockedAgent };
 
-    return blockUser;
   } catch (err: any) {
     await session.abortTransaction();
+    throw new Error(err.message);
+  } finally {
     await session.endSession();
-    throw new Error(err);
   }
+
 };
 const agentApprovalFromDB = async (id: string, action : string) => {
   const session = await mongoose.startSession();
@@ -93,5 +123,6 @@ export const AdminServices = {
   getAllAgentFromDB,
  getSingleUserFromDB,
  blockUserFromDB
- ,agentApprovalFromDB
+ ,agentApprovalFromDB,getAllCustomerUserFromDB
+ 
 };

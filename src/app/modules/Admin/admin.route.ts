@@ -16,6 +16,12 @@ router.put(
   AdminControllers.agentApproval,
 );
 
+router.put(
+  '/agent',
+  auth( USER_ROLE.admin),
+  AdminControllers.agentApproval,
+);
+
 
 
 router.get(
@@ -26,8 +32,17 @@ router.get(
 
 
 
+router.get(
+  '/all-customer',
+  (req, res) => {
+    res.send('All customer');
+  },
+);
+
+
+
 router.put(
-  '/:id',
+  '/user-block',
   auth(USER_ROLE.admin),
   AdminControllers.blockUser,
 );

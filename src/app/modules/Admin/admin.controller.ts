@@ -26,12 +26,23 @@ const getAllAgent = catchAsync(async (req, res) => {
     data: result.result,
   });
 });
+const getCustomerUser = catchAsync(async (req, res) => {
+  const result = await AdminServices.getAllCustomerUserFromDB(req.query);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Customer user are retrieved succesfully',
+    meta: result.meta,
+    data: result.result,
+  });
+});
 
 
 
 const blockUser = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const result = await AdminServices.blockUserFromDB(id);
+  const { userId, agentId } = req.body;
+  const result = await AdminServices.blockUserFromDB(userId, agentId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -42,8 +53,7 @@ const blockUser = catchAsync(async (req, res) => {
 });
 const agentApproval = catchAsync(async (req, res) => {
   const { action , id} = req.body;
-  console.log(action);
-  console.log(id);
+
   const result = await AdminServices.agentApprovalFromDB(id, action);
 
   sendResponse(res, {
@@ -54,6 +64,7 @@ const agentApproval = catchAsync(async (req, res) => {
   });
 });
 
+
 export const AdminControllers = {
-  getAllAgent,getSingleUser,blockUser,agentApproval
+  getAllAgent,getSingleUser,blockUser,agentApproval,getCustomerUser
 };

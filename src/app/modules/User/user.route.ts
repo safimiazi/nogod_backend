@@ -11,6 +11,11 @@ router.post(
 
   UserControllers.registration,
 );
+router.get(
+  '/all-users',
+  auth( USER_ROLE.admin),
+  UserControllers.GetAllUsers,
+);
 
 
 router.post(

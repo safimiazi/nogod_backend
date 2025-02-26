@@ -6,6 +6,7 @@ export interface IAgent {
     is_approved: 'approved' | 'pending' | 'rejected';
     income: number;
     mobile: string;
+    status:  'blocked'| 'active';
 
     created_at?: Date;
     updated_at?: Date;

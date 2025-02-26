@@ -171,15 +171,13 @@ const UserCashOutIntodb = async (
         if (!admin) {
           throw new AppError(httpStatus.BAD_REQUEST, 'Admin not found.');
         }
-        console.log("agentUser",agentUser);
         // Find agent
         const agent = await agentModel.findOne({ user_id: agentUser._id }).session(session);
-        console.log(agent);
         if (!agent) {
           throw new AppError(httpStatus.BAD_REQUEST, 'agent not found.');
         }
 
-        if(agent.is_approved === false){
+        if(agent.is_approved === "pending"){
           throw new AppError(httpStatus.FORBIDDEN, 'Agent is not active yet');
         }
     

@@ -32,12 +32,6 @@ router.get(
 
 
 
-router.get(
-  '/all-customer',
-  (req, res) => {
-    res.send('All customer');
-  },
-);
 
 
 

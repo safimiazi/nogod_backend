@@ -15,13 +15,13 @@ const getSingleUser = catchAsync(async (req, res) => {
   });
 });
 
-const getAllUsers = catchAsync(async (req, res) => {
-  const result = await AdminServices.getAllUsersFromDB(req.query);
+const getAllAgent = catchAsync(async (req, res) => {
+  const result = await AdminServices.getAllAgentFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Users are retrieved succesfully',
+    message: 'Agents are retrieved succesfully',
     meta: result.meta,
     data: result.result,
   });
@@ -40,10 +40,20 @@ const blockUser = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const agentApproval = catchAsync(async (req, res) => {
+  const { action , id} = req.body;
+  console.log(action);
+  console.log(id);
+  const result = await AdminServices.agentApprovalFromDB(id, action);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Agent is ${action === "reject" ? "rejected" : "approved"} succesfully`,
+    data: result,
+  });
+});
 
 export const AdminControllers = {
-  getAllAdmins,
-  getSingleAdmin,
-  deleteAdmin,
-  updateAdmin,
+  getAllAgent,getSingleUser,blockUser,agentApproval
 };

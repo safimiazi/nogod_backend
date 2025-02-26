@@ -2,13 +2,17 @@
 import express from 'express';
 import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../User/user.constant';
-import { CashInController } from './agent.controller';
+import { AgentController } from './agent.controller';
 
 const router = express.Router();
 
-router.post('/cash-in',auth(USER_ROLE.agent) ,CashInController.cashInUserThroughAgent);
+router.post('/cash-in',auth(USER_ROLE.agent) ,AgentController.cashInUserThroughAgent);
 
-
+router.get(
+    '/approved-agents',
+    auth( USER_ROLE.admin),
+    AgentController.ApprovedAgents,
+  );
 
 
 export const agentRoute = router;

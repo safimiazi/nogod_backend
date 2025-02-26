@@ -5,17 +5,19 @@ import { User } from "../User/user.model";
 import { AdminSearchableFields } from "./admin.constant";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
+import { agentModel } from "../agent/agent.model";
 
 
-const getAllUsersFromDB = async (query: Record<string, unknown>) => {
-  const userQuery = new QueryBuilder(User.find(), query)
+const getAllAgentFromDB = async (query: Record<string, unknown>) => {
+  const userQuery = new QueryBuilder(agentModel.find({ is_approved: "pending" }), query)
     .search(AdminSearchableFields)
     .filter()
     .sort()
     .paginate()
     .fields();
 
-  const result = await userQuery.modelQuery;
+  const result = await userQuery.modelQuery.populate("user_id") 
+  .exec();
   const meta = await userQuery.countTotal();
   return {
     result,
@@ -58,9 +60,38 @@ const blockUserFromDB = async (id: string) => {
     throw new Error(err);
   }
 };
+const agentApprovalFromDB = async (id: string, action : string) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const actionAgent = await agentModel.findByIdAndUpdate(
+      id,
+      { is_approved: `${action === "reject"? "rejected" : "approved"}` },
+      { new: true, session },
+    );
+
+    if (!actionAgent) {
+      throw new AppError(httpStatus.BAD_REQUEST, `Failed to ${action === "reject"? "reject" : "approve"} agent`);
+    }
+
+   
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return actionAgent;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
 
 export const AdminServices = {
- getAllUsersFromDB,
+  getAllAgentFromDB,
  getSingleUserFromDB,
  blockUserFromDB
+ ,agentApprovalFromDB
 };

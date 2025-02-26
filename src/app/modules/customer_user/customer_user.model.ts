@@ -4,6 +4,8 @@ import { ICustomerUser } from "./customer_user.interface";
 const customerUserSchema = new mongoose.Schema({
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     bonus: { type: Number, default: 0 },
+    mobile: {type: String},
+
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now }
 });

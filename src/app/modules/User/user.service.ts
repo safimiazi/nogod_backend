@@ -58,14 +58,15 @@ const registrationIntoDB = async (payload: TUser) => {
     if (payload.role.toLowerCase() === 'agent') {
       const payload: Partial<IAgent> = {};
       payload.user_id = newUser[0]._id;
-      payload.is_approved = false;
       payload.income = 0;
+      payload.mobile= newUser[0].mobile;
       createNewUser = await agentModel.create([payload], { session });
     }
 
     if (payload.role.toLowerCase() === 'user') {
       const payload: Partial<ICustomerUser> = {};
       payload.user_id = newUser[0]._id;
+      payload.mobile= newUser[0].mobile;
       payload.bonus = 40;
       createNewUser = await customerUserModel.create([payload], { session });
     }

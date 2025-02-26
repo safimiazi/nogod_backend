@@ -6,27 +6,30 @@ import { AdminControllers } from './admin.controller';
 const router = express.Router();
 
 router.get(
-  '/',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-  AdminControllers.getAllAdmins,
+  '/agents',
+  auth( USER_ROLE.admin),
+  AdminControllers.getAllAgent,
 );
+router.put(
+  '/agent',
+  auth( USER_ROLE.admin),
+  AdminControllers.agentApproval,
+);
+
+
 
 router.get(
   '/:id',
-  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
-  AdminControllers.getSingleAdmin,
+  auth( USER_ROLE.admin),
+  AdminControllers.getSingleUser,
 );
 
-router.patch(
+
+
+router.put(
   '/:id',
-  auth(USER_ROLE.superAdmin),
-  AdminControllers.updateAdmin,
-);
-
-router.delete(
-  '/:adminId',
-  auth(USER_ROLE.superAdmin),
-  AdminControllers.deleteAdmin,
+  auth(USER_ROLE.admin),
+  AdminControllers.blockUser,
 );
 
 export const AdminRoutes = router;

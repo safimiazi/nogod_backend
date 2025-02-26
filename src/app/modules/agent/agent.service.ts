@@ -9,8 +9,11 @@ import { sendNotification } from '../../utils/notification';
 import { transactionModel } from '../transaction/transaction.model';
 import { transaction_type } from '../../utils/constant';
 import { generateRandomUniqueNumber } from '../../utils/generate_rendom_unique_number';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { agentModel } from './agent.model';
+import { AdminSearchableFields } from '../Admin/admin.constant';
 
-export const CashInService = {
+export const AgnetServices = {
   cashInUserThroughAgent: async (
     agentPhone: string,
     userPhone: string,
@@ -109,4 +112,21 @@ export const CashInService = {
       throw error;
     }
   },
+
+ getAllApprovedAgent : async (query: Record<string, unknown>) => {
+    const userQuery = new QueryBuilder(agentModel.find({ is_approved: "approved" }), query)
+      .search(AdminSearchableFields)
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+  
+    const result = await userQuery.modelQuery.populate("user_id") 
+    .exec();
+    const meta = await userQuery.countTotal();
+    return {
+      result,
+      meta,
+    };
+  }
 };

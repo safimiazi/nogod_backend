@@ -22,7 +22,6 @@ const adminSchema = new Schema<TAdmin, AdminModel>(
       type: Boolean,
       default: false,
     },
-    
   },
   {
     toJSON: {

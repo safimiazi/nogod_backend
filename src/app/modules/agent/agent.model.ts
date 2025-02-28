@@ -1,8 +1,8 @@
-import mongoose, { model } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 import { IAgent } from "./agent.interface";
 
 const agentSchema = new mongoose.Schema<IAgent>({
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     is_approved: {
         type: String,
         enum: ['approved', 'pending', 'rejected'],

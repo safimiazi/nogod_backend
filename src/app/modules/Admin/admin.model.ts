@@ -9,6 +9,7 @@ const adminSchema = new Schema<TAdmin, AdminModel>(
       unique: true,
       ref: 'User',
     },
+    
     total_income: {
       type: Number,
     },

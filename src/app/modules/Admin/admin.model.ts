@@ -13,7 +13,7 @@ const adminSchema = new Schema<TAdmin, AdminModel>(
     total_income: {
       type: Number,
     },
-    
+
     total_money_in_system: {
       type: Number,
     },
@@ -22,6 +22,7 @@ const adminSchema = new Schema<TAdmin, AdminModel>(
       type: Boolean,
       default: false,
     },
+    
   },
   {
     toJSON: {
